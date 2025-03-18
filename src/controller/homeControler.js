@@ -1,4 +1,7 @@
 import mysql from 'mysql2/promise';
+import bcrypt from 'bcrypt';
+
+const saltRounds = 10;
 
 let connection;
 
@@ -23,12 +26,15 @@ const home2 = (req, res) => {
 const home3 = async (req, res) => {
     let email = req.body['email-name'];
     let pass = req.body.pass;
-    let user = req.body.username;
+    let userName = req.body.username;
+
+    const hashedPassword = await bcrypt.hash(pass, saltRounds);
+    console.log(hashedPassword);
 
     try {
         const [results, fields] = await connection.query(
             'INSERT INTO users (email, password, username) VALUES (?, ?, ?)',
-            [email, pass, user]
+            [email, hashedPassword, userName]
         );
         console.log(results); // results contains rows returned by server
         console.log(fields); // fields contains extra meta data about results, if available
